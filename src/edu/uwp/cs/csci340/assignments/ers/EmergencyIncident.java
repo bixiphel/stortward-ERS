@@ -1,6 +1,8 @@
 package edu.uwp.cs.csci340.assignments.ers;
 
-public class EmergencyIncident implements Comparable {
+import java.time.LocalDateTime;
+
+public class EmergencyIncident implements Comparable<EmergencyIncident> {
     // Instance Variables
     private int idCounter;
     private int incidentID;
@@ -8,7 +10,6 @@ public class EmergencyIncident implements Comparable {
     private int severityLevel;
     private int responseTime;
     private int location;
-
 
     /** 5-param constructor for an Emergency Incident.
      * @param incidentType The type of incident that is being reported (i.e. 'medical').
@@ -115,4 +116,74 @@ public class EmergencyIncident implements Comparable {
         this.location = location;
     }
 
+    /**
+     * @param o the object to be compared.
+     * @return 0 if the incidents are of equal priority, 1 if the first incident is of higher priority, -1 if the passed (second) incident is of higher priority.
+     */
+    @Override
+    public int compareTo(EmergencyIncident o) {
+        // To determine the ordering of incidents, we first look at the incident with the highest priority (1-Highest, 5-Lowest)
+        if(this.severityLevel > o.getSeverityLevel()) {
+            return 1;
+        } else if(this.severityLevel < o.severityLevel) {
+            return -1;
+        }
+
+        // If the severity level of two incidents are the same, we choose the incident with the lowest response time
+        if(this.responseTime < o.responseTime) {
+            return 1;
+        } else if(this.responseTime > o.responseTime) {
+            return -1;
+        } else {
+            // If they are the same, it doesn't matter which is picked
+            return 0;
+        }
+    }
+
+    /** Generates a report-styled block of the attributes of an incident, which include things such as the severity, ID, and date/time the report was created.
+     * @return
+     */
+    @Override
+    public String toString() {
+        // Gets the string associated with the severity depending on the severity level
+        String severity = "";
+        switch (getSeverityLevel()) {
+            case 1: severity = "High"; break;
+            case 2: severity = "Medium-High"; break;
+            case 3: severity = "Medium"; break;
+            case 4: severity = "Medium-Low"; break;
+            case 5: severity = "Low"; break;
+            default: severity = "Low"; break;
+        }
+
+        // List of locations
+        String[] locations = {"Fire Station", "Auden Winstone residence", "Philberta Thornee residence", "Shelby Halee residence", "Brock Wynnee residence", "Woodrow Langley residence", "Hayden Browne residence", "North Island Hospital", "Fairburne Manufacturing", "Bloodworthe Construction", "Graham Medical", "Stortward School", "Blythe Hartelle's Blacksmith Shoppe", "Baxtere's Department Storee", "Stortward Watertower", "Harper Vanne's Fish Market", "Caulfielde's Supermarket", "Linley Wilkiee's Shoe Shoppe", "Stortward Power Plant", "South Pier", "Azure Bridge", "Downtown Stortward"};
+
+        // Gets the district name that the incident took place in
+        String district = "";
+        if(getLocation() >= 2 && getLocation() <= 5) {
+            district = "Residential District";
+        } else if(getLocation() >= 6 && getLocation() <= 8) {
+            district = "Fishing District";
+        } else if(getLocation() >= 9 && getLocation() <= 13) {
+            district = "Industrial District";
+        } else if(getLocation() == 16 || getLocation() == 19 || getLocation() == 20) {
+            district = "South Pier District";
+        } else if(getLocation() == 17 || getLocation() == 18 || getLocation() == 14 || getLocation() == 15) {
+            district = "Downtown";
+        }
+
+        // Gets the local date and time
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        // Generates the formatted EmergencyIncident object as a string
+        return  dateTime.toString() + "\n" +
+                "| ID: " + getIncidentID() + "\n" +
+                "| Type: " + getIncidentType() + "\n" +
+                "| Severity: " + severity + "(" + getSeverityLevel() + ")\n" +
+                "| Location: " + locations[getLocation() - 1] + "(" + getLocation() + ")\n" +
+                "| District: " + district + "\n" +
+                "| Response Time: " + getResponseTime() + " minutes\n" +
+                "+----------\n";
+    }
 }
