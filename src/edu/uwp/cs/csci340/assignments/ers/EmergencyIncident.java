@@ -11,19 +11,32 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
     private int responseTime;
     private int location;
 
-    /** 5-param constructor for an Emergency Incident.
+    /** 4-param constructor for an Emergency Incident.
      * @param incidentType The type of incident that is being reported (i.e. 'medical').
      * @param incidentID The ID of the incident.
      * @param severityLevel The severity level of the incident on a 5-point scale (1-Highest, 5-Lowest).
-     * @param responseTime The response time it takes to reach the incident.
      * @param location The location of the incident.
      */
-    public EmergencyIncident(String incidentType, int incidentID, int severityLevel, int responseTime, int location) {
+    public EmergencyIncident(int incidentID, String incidentType, int severityLevel, int location) {
         this.incidentType = incidentType;
         this.incidentID = incidentID;
         this.severityLevel = severityLevel;
-        this.responseTime = responseTime;
         this.location = location;
+
+        // This sets the response time based on the district the incident is in
+        if(getLocation() >= 2 && getLocation() <= 5) {
+            setResponseTime(5);
+        } else if(getLocation() >= 6 && getLocation() <= 8) {
+            setResponseTime(7);
+        } else if(getLocation() >= 9 && getLocation() <= 13 || getLocation() == 21) {
+            // I placed location 21 (The Azure Bridge) in here since it was closer to this district, but wasn't listed in the districts
+            setResponseTime(10);
+        } else if(getLocation() == 16 || getLocation() == 19 || getLocation() == 20) {
+            setResponseTime(20);
+        } else if(getLocation() == 17 || getLocation() == 18 || getLocation() == 14 || getLocation() == 15 || getLocation() == 22) {
+            // I placed location 22 (Downtown Stortward) in here because it's closest to this district and wasn't listed in the districts
+            setResponseTime(15);
+        }
     }
 
     /** Gets the ID Counter.
@@ -75,8 +88,8 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
         return severityLevel;
     }
 
-    /** Sets the severity level on a 5 point scale (1-Highest, 5-Lowest)
-     * @param severityLevel
+    /** Sets the severity level on a 5 point integer scale
+     * @param severityLevel int storing the severity level (1-Highest, 5-Lowest)
      */
     public void setSeverityLevel(int severityLevel) {
         // Performs some error checking to make sure the severity level is strictly between 1 and 5 (inclusive)
@@ -109,11 +122,16 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
         return location;
     }
 
-    /** Sets the numerical location as a value (1-22)
-     * @param location
+    /** Sets the numerical location as a value
+     * @param location int value for the location valid values are 1-22 inclusive
      */
     public void setLocation(int location) {
-        this.location = location;
+        if(location >= 1 && location <= 22) {
+            this.location = location;
+        } else {
+            // Defaults to -1, which is not a given location
+            this.location = -1;
+        }
     }
 
     /**
@@ -141,20 +159,19 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
     }
 
     /** Generates a report-styled block of the attributes of an incident, which include things such as the severity, ID, and date/time the report was created.
-     * @return
+     * @return List of attributes that an incident has
      */
     @Override
     public String toString() {
         // Gets the string associated with the severity depending on the severity level
-        String severity = "";
-        switch (getSeverityLevel()) {
-            case 1: severity = "High"; break;
-            case 2: severity = "Medium-High"; break;
-            case 3: severity = "Medium"; break;
-            case 4: severity = "Medium-Low"; break;
-            case 5: severity = "Low"; break;
-            default: severity = "Low"; break;
-        }
+        String severity = switch (getSeverityLevel()) {
+            case 1 -> "High";
+            case 2 -> "Medium-High";
+            case 3 -> "Medium";
+            case 4 -> "Medium-Low";
+            case 5 -> "Low";
+            default -> "Low";
+        };
 
         // List of locations
         String[] locations = {"Fire Station", "Auden Winstone residence", "Philberta Thornee residence", "Shelby Halee residence", "Brock Wynnee residence", "Woodrow Langley residence", "Hayden Browne residence", "North Island Hospital", "Fairburne Manufacturing", "Bloodworthe Construction", "Graham Medical", "Stortward School", "Blythe Hartelle's Blacksmith Shoppe", "Baxtere's Department Storee", "Stortward Watertower", "Harper Vanne's Fish Market", "Caulfielde's Supermarket", "Linley Wilkiee's Shoe Shoppe", "Stortward Power Plant", "South Pier", "Azure Bridge", "Downtown Stortward"};
@@ -167,9 +184,9 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
             district = "Fishing District";
         } else if(getLocation() >= 9 && getLocation() <= 13) {
             district = "Industrial District";
-        } else if(getLocation() == 16 || getLocation() == 19 || getLocation() == 20) {
+        } else if(getLocation() == 16 || getLocation() == 19 || getLocation() == 20 || getLocation() == 21) {
             district = "South Pier District";
-        } else if(getLocation() == 17 || getLocation() == 18 || getLocation() == 14 || getLocation() == 15) {
+        } else if(getLocation() == 17 || getLocation() == 18 || getLocation() == 14 || getLocation() == 15 || getLocation() == 22) {
             district = "Downtown";
         }
 
@@ -177,7 +194,7 @@ public class EmergencyIncident implements Comparable<EmergencyIncident> {
         LocalDateTime dateTime = LocalDateTime.now();
 
         // Generates the formatted EmergencyIncident object as a string
-        return  dateTime.toString() + "\n" +
+        return  dateTime + "\n" +
                 "| ID: " + getIncidentID() + "\n" +
                 "| Type: " + getIncidentType() + "\n" +
                 "| Severity: " + severity + "(" + getSeverityLevel() + ")\n" +
