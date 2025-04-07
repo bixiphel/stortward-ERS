@@ -6,16 +6,17 @@ import java.io.IOException;
 import java.util.Random;
 
 public class GenerateIncident {
-    // This generates incidents randomly and stores it in a CSV file
 
+    // This generates incidents randomly and stores it in a CSV file
     public static void main(String[] args) {
-        // Create the file
+        // Creates the file
         try {
             File incidents = new File("incidents.csv");
+
             if(incidents.createNewFile()) {
-                System.out.println("File created");
+                // File was created
             } else {
-                System.out.println("File already exists");
+                // File already exists
             }
         } catch (IOException e) {
             System.out.println("File could not be created.");
@@ -23,14 +24,20 @@ public class GenerateIncident {
 
         // Write the incidents to the file
         try {
-            FileWriter fileOut = new FileWriter("incidents.csv");
 
             // Sets the number of incidents to generate
             int maxIncidents = 10;
+            System.out.printf("Generating %d Incidents...\n", maxIncidents);
+
+            // Creates a FileWriter object to write to the file
+            FileWriter fileOut = new FileWriter("incidents.csv");
+            System.out.printf("Initalizing... [Complete]\nOpening output file... [Complete]\n");
 
             // Creates a String array of possible incident types
             String[] incidentTypes = {"fire", "medical", "accident"};
 
+            // Generates the CSV file filled with randomly generated incidents
+            System.out.printf("Generating CSV file...");
             for(int i = 1; i <= maxIncidents; i++) {
                 // Incidents are formated as [incidentID],[incidentType],[incidentSeverity],[incidentLocation]
                 // [incidentID] is the number of the incident, so we can use the counter i as the ID.
@@ -49,7 +56,12 @@ public class GenerateIncident {
                 // Writes the incidents to the CSV
                 fileOut.write(i + "," + randomIncident + "," + randomSeverity + "," + randomLocation + "\n");
             }
+            System.out.printf("[Complete]\n"); // Message indicating the generation of the CSV file is complete.
+
+            // Closes the file, which saves the changes to the file.
             fileOut.close();
+            System.out.printf("DONE\n");
+
         } catch(IOException e) {
             System.out.println("Cannot write to file.");
         }
